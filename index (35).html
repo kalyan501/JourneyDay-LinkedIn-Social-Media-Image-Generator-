@@ -1,0 +1,140 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Display App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lobster&display=swap" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div id="app" class="text-center">
+        <div id="input-section" class="flex flex-col items-center justify-center h-screen">
+            <input id="number-input" type="number" placeholder="Enter a number" class="border border-gray-300 p-2 rounded mb-4 text-center">
+            <button id="select-font-btn" class="bg-blue-500 text-white px-4 py-2 rounded">Select Font</button>
+        </div>
+
+        <div id="font-selection" class="hidden flex flex-col items-center justify-center h-screen">
+            <input id="font-search" type="text" placeholder="Search fonts" class="border border-gray-300 p-2 rounded mb-4 text-center">
+            <div class="grid grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+                <button class="font-option font-roboto bg-gray-200 p-2 rounded">Roboto</button>
+                <button class="font-option font-open-sans bg-gray-200 p-2 rounded">Open Sans</button>
+                <button class="font-option font-lobster bg-gray-200 p-2 rounded">Lobster</button>
+                <button class="font-option font-roboto bg-gray-200 p-2 rounded">Roboto</button>
+                <button class="font-option font-open-sans bg-gray-200 p-2 rounded">Open Sans</button>
+                <button class="font-option font-lobster bg-gray-200 p-2 rounded">Lobster</button>
+                <button class="font-option font-roboto bg-gray-200 p-2 rounded">Roboto</button>
+                <button class="font-option font-open-sans bg-gray-200 p-2 rounded">Open Sans</button>
+                <button class="font-option font-lobster bg-gray-200 p-2 rounded">Lobster</button>
+                <button class="font-option font-roboto bg-gray-200 p-2 rounded">Roboto</button>
+                <button class="font-option font-open-sans bg-gray-200 p-2 rounded">Open Sans</button>
+                <button class="font-option font-lobster bg-gray-200 p-2 rounded">Lobster</button>
+            </div>
+            <button id="show-me-btn" class="bg-green-500 text-white px-4 py-2 rounded mt-4">Show Me</button>
+        </div>
+
+        <div id="output-section" class="hidden flex flex-col items-center justify-center h-screen">
+            <div id="output-number" class="text-9xl font-bold"></div>
+            <div id="output-day" class="text-5xl mt-4">day</div>
+            <div id="output-journey" class="text-3xl mt-2">Journey</div>
+            <button id="screenshot-btn" class="bg-yellow-500 text-white px-4 py-2 rounded mt-4">Screenshot</button>
+            <div id="download-options" class="hidden mt-4">
+                <button id="download-jpg" class="bg-blue-500 text-white px-4 py-2 rounded">Download as JPG</button>
+                <button id="download-png" class="bg-green-500 text-white px-4 py-2 rounded">Download as PNG</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const numberInput = document.getElementById('number-input');
+        const selectFontBtn = document.getElementById('select-font-btn');
+        const fontSelection = document.getElementById('font-selection');
+        const fontSearch = document.getElementById('font-search');
+        const fontOptions = document.querySelectorAll('.font-option');
+        const showMeBtn = document.getElementById('show-me-btn');
+        const outputSection = document.getElementById('output-section');
+        const outputNumber = document.getElementById('output-number');
+        const outputDay = document.getElementById('output-day');
+        const outputJourney = document.getElementById('output-journey');
+        const screenshotBtn = document.getElementById('screenshot-btn');
+        const downloadOptions = document.getElementById('download-options');
+        const downloadJpg = document.getElementById('download-jpg');
+        const downloadPng = document.getElementById('download-png');
+
+        let selectedFont = '';
+
+        selectFontBtn.addEventListener('click', () => {
+            document.getElementById('input-section').classList.add('hidden');
+            fontSelection.classList.remove('hidden');
+        });
+
+        fontSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            fontOptions.forEach(option => {
+                if (option.textContent.toLowerCase().includes(searchTerm)) {
+                    option.classList.remove('hidden');
+                } else {
+                    option.classList.add('hidden');
+                }
+            });
+        });
+
+        fontOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                selectedFont = option.classList[1];
+                fontOptions.forEach(opt => opt.classList.remove('bg-blue-500', 'text-white'));
+                option.classList.add('bg-blue-500', 'text-white');
+            });
+        });
+
+        showMeBtn.addEventListener('click', () => {
+            const number = numberInput.value;
+            if (number && selectedFont) {
+                let suffix = '';
+                if (number == 1) {
+                    suffix = 'st';
+                } else if (number == 2) {
+                    suffix = 'nd';
+                } else if (number == 3) {
+                    suffix = 'rd';
+                } else {
+                    suffix = 'th';
+                }
+                outputNumber.innerHTML = `${number}<span class="text-5xl align-top"> ${suffix}</span>`;
+                outputNumber.classList.add(selectedFont);
+                outputDay.classList.add(selectedFont);
+                outputJourney.classList.add(selectedFont);
+                fontSelection.classList.add('hidden');
+                outputSection.classList.remove('hidden');
+            } else {
+                alert('Please enter a number and select a font.');
+            }
+        });
+
+        screenshotBtn.addEventListener('click', () => {
+            downloadOptions.classList.remove('hidden');
+        });
+
+        function takeScreenshot(format) {
+            const buttons = [screenshotBtn, downloadJpg, downloadPng];
+            buttons.forEach(button => button.classList.add('invisible'));
+
+            setTimeout(() => {
+                html2canvas(document.body).then(canvas => {
+                    const imgData = canvas.toDataURL(`image/${format}`);
+                    const link = document.createElement('a');
+                    link.href = imgData;
+                    link.download = `screenshot.${format}`;
+                    link.click();
+
+                    buttons.forEach(button => button.classList.remove('invisible'));
+                });
+            }, 500);
+        }
+
+        downloadJpg.addEventListener('click', () => takeScreenshot('jpeg'));
+        downloadPng.addEventListener('click', () => takeScreenshot('png'));
+    </script>
+</body>
+</html>
